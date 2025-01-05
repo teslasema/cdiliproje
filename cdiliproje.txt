@@ -1,0 +1,204 @@
+#include <stdio.h>
+#include <stdlib.h>
+//alısveris uygulamasi yaptım giyim alımında yan urunler indirimli 
+//eger sali günü ise yan urunler hediye edilecek.gun icinde max 100 musteri.
+//musteri sayısını döngü icinde kullandım.uygun beden secimi icin fonksiyona dahil edip beden hesaplamasını yaptırdım.
+//renk secimi icin switch case kullandım.
+//gun sonunda toplam musteri sayısı,toplam kazanci yazdıran projemde kullanıcı verilerini dosyaya yazdırmasını sağladım.
+// dosyalama kullanarak.dizileri katagoriler kısmında kullandım.
+//karakter dizini karsilama metninde kullandım.
+// VKI hesaplama fonksiyonu
+float hesapla_VKI(float boy, float kilo) {
+    return kilo / (boy * boy);
+}
+
+int main() {
+    int katagori, alt_katagori, renk, kemer, gun,saat;
+    float boy, kilo, VKI;
+    int kullanici_adi;
+    int max_musteri = 100; // Maksimum müşteri sayısı
+    int musteri_sayisi = 0; // Şu anki müşteri sayısı
+    float toplam_kazanc = 0; // Günlük toplam kazanç
+
+    // Dosya açma
+    FILE* dosya;
+    dosya = fopen("kullaniciverileri.txt", "w");
+    if (dosya == NULL) {
+        printf("Dosya acilamadi!\n");
+        return 1;
+    }
+    //karsilama metni
+    char karsilama_metni[100]="MAGZAMIZA HOSGELDİNİZ";
+    char karsilama_metni2[5];
+    char karsilama_metni3[75]=" Patron cildirdi! sali günleri yapacak oldugunuz alisverislerde yan urun hediyemiz!";
+
+    printf("%d\n",strcat(karsilama_metni,karsilama_metni3));
+
+    // Diziler ile kategoriler ve alt kategoriler
+    const char* ust_giyim[] = {"Bluz", "Kazak", "Tişört", "Gömlek"};
+    const char* alt_giyim[] = {"Etek", "Pantolon", "Şort"};
+
+    // Alışveriş döngüsü
+    while (musteri_sayisi < max_musteri) {
+        musteri_sayisi++;
+
+        // Kullanıcı girişi
+        printf("Lütfen kullanici adinizi giriniz: ");
+        scanf("%d", &kullanici_adi);
+        printf("Hoşgeldiniz %d\n", kullanici_adi);
+
+        // Kategori seçimi
+        printf("Almak istediğiniz ürünün kategorisini seçiniz:\n");
+        printf("1. Üst Giyim (50 TL)\n");
+        printf("2. Alt Giyim (70 TL)\n");
+        scanf("%d", &katagori);
+
+        if (katagori == 1) {
+            // Alt kategori seçimi (Üst Giyim)
+            printf("Lütfen alt kategori seçimi yapiniz:\n");
+            for (int i = 0; i < 4; i++) {
+                printf("%d. %s\n", i + 1, ust_giyim[i]);
+            }
+            scanf("%d", &alt_katagori);
+
+            if (alt_katagori >= 1 && alt_katagori <= 4) {
+                printf("%s secimi yapiniz.\n", ust_giyim[alt_katagori - 1]);
+                toplam_kazanc += 50; // Fiyat ekleme
+                fprintf(dosya, "Kullanici: %d, Kategori: Üst Giyim, Ürün: %s, Fiyat: 50 TL\n", 
+                        kullanici_adi, ust_giyim[alt_katagori - 1]);
+            } else {
+                printf("Geçersiz seçim.\n");
+                continue;
+            }
+
+            // Saat promosyonu
+            printf("İndirimli saat almak ister misiniz? (1: Evet, 0: Hayır): ");
+            scanf("%d", &kemer);
+            if (kemer == 1) {
+                printf("Saat aldini! Yüzde 50 indirim uygulanacak.\n");
+                toplam_kazanc += 10; // İndirimli fiyat
+                fprintf(dosya, "Kullanici: %d, Promosyon: Saat, Fiyat: 10 TL\n", kullanici_adi);
+            }
+        } else if (katagori == 2) {
+            // Alt kategori seçimi (Alt Giyim)
+            printf("Lütfen alt kategori seçimi yapiniz:\n");
+            for (int i = 0; i < 3; i++) {
+                printf("%d. %s\n", i + 1, alt_giyim[i]);
+            }
+            scanf("%d", &alt_katagori);
+
+            if (alt_katagori >= 1 && alt_katagori <= 3) {
+                printf("%s seçimi yaptiniz.\n", alt_giyim[alt_katagori - 1]);
+                toplam_kazanc += 70; // Fiyat ekleme
+                fprintf(dosya, "Kullanici: %d, Kategori: Alt Giyim, Ürün: %s, Fiyat: 70 TL\n", 
+                        kullanici_adi, alt_giyim[alt_katagori - 1]);
+            } else {
+                printf("Geçersiz seçim.\n");
+                continue;
+            }
+
+            // Kemer promosyonu
+            printf("İndirimli kemer almak ister misiniz? (1: Evet, 0: Hayır): ");
+            scanf("%d", &kemer);
+            if (kemer == 1) {
+                printf("Kemer aldiniz! Yüzde 50 indirim uygulanacak.\n");
+                toplam_kazanc += 10; // İndirimli fiyat
+                fprintf(dosya, "Kullanici: %d, Promosyon: Kemer, Fiyat: 10 TL\n", kullanici_adi);
+            }
+
+            // Promosyon ürünü indirimi kontrolü 
+     
+     
+    if (kemer==1 || saat==1) { 
+        // Saat veya kemer promosyon seçimi 
+        
+            printf("Bugün günlerden nedir? (1: Pazartesi, 2: Sali, ...)\n"); 
+            scanf("%d", &gun); 
+            if (gun == 2) { // 2 Salıyı temsil ediyor 
+                printf("Bugün sali! Promosyon urunu hediyeniz olarak verilmektedir.\n"); 
+                toplam_kazanc-=10;
+                fprintf(dosya,"Kullanici: %d,Promosyon urunu hediye olarak verildi.",kullanici_adi);
+            } else { 
+                printf("Sali günleri magzamizda uygulanan promosyonlar hediye kampanyasindan yararlanmayi unutmayin.\n"); 
+            } 
+        
+             
+           
+ 
+    // Renk seçimi 
+    printf("Urun icin renk seciniz:\n");
+printf("1. Kirmizi\n2. Sari\n3. Mavi\n4. Yesil\n");
+scanf("%d", &renk);
+
+switch(renk) {
+    case 1:
+        printf("Urununuz icin kirmizi rengini sectiniz.\n");
+        break;
+    case 2:
+        printf("Urununuz icin sari rengini sectiniz.\n");
+        break;
+    case 3:
+        printf("Urununuz icin mavi rengini sectiniz.\n");
+        break;
+    case 4:
+        printf("Urununuz icin yesil rengini sectiniz.\n");
+        break;
+    default:
+        printf("Bu renk mevcut degil.\n");
+        break;
+    } }
+    else {
+            printf("Geçersiz kategori.\n");
+            continue;
+        }
+
+        // Boy ve kilo girişi
+        printf("Boyunuzu giriniz (metre cinsinden): ");
+        scanf("%f", &boy);
+        printf("Kilonuzu giriniz (kg): ");
+        scanf("%f", &kilo);
+
+        // VKI hesaplama
+        VKI = hesapla_VKI(boy, kilo);
+        printf("VKI: %.2f\n", VKI);
+
+        // Beden önerisi
+        if (VKI >= 15 && VKI < 19) {
+            printf("S bedeni uygun.\n");
+        } else if (VKI >= 19 && VKI < 23) {
+            printf("M bedeni uygun.\n");
+        } else if (VKI >= 23 && VKI < 27) {
+            printf("L bedeni uygun.\n");
+        } else if (VKI >= 27 && VKI < 31) {
+            printf("XL bedeni uygun.\n");
+        } else {
+            printf("Size uygun beden mevcut değil.\n");
+        }
+
+        // Alışverişe devam etme seçimi
+        printf("Alisverişe devam etmek istiyor musunuz? (1: Evet, 0: Hayır): ");
+        int devam;
+        scanf("%d", &devam);
+        if (devam == 0) {
+            printf("Alisveriş için teşekkür ederiz.\n");
+            break;
+        }
+    }
+
+    if (musteri_sayisi >= max_musteri) {
+        printf("Günlük maksimum müşteri sayisina ulasildi.\n");
+    }
+
+    // Gün sonu toplam kazanç ve müşteri sayısı
+    printf("\nGün sonu raporu:\n");
+    printf("Toplam müşteri sayisi: %d\n", musteri_sayisi);
+    printf("Toplam kazanç: %.2f TL\n", toplam_kazanc);
+
+    // Dosya kapama
+    fclose(dosya);
+
+    return 0;
+} }
+  
+
+}
